@@ -1,35 +1,71 @@
-const SMTPServer = require('smtp-server').SMTPServer;
+const { SMTPServer } = require('smtp-server');
+const simpleParser = require('mailparser').simpleParser; // To parse incoming mail
 
-// Define valid credentials (email and password)
-const users = {
-  'user@example.com': 'yourpassword', // Add users and their passwords here
-};
-
+// Create the SMTP server
 const server = new SMTPServer({
-  // Require authentication
-  authOptional: false,
+  // Allow valid email addresses and authentication (if needed)
+  authOptional: true, // Set to false if you want to enforce authentication
 
-  // Authenticate user
-  onAuth(auth, session, callback) {
-    const { username, password } = auth;
-    
-    // Validate credentials
-    if (users[username] === password) {
-      return callback(null, { user: username });
-    }
-
-    // If authentication fails
-    return callback(new Error('Invalid email or password'));
-  },
-
-  // Handle incoming emails
+  // Event handler for processing incoming mail
   onData(stream, session, callback) {
-    stream.pipe(process.stdout); // Log email to console or process as needed
+    simpleParser(stream)
+      .then(parsed => {
+        console.log('From:', parsed.from.value);
+        console.log('To:', parsed.to.value);
+        console.log('Subject:', parsed.subject);
+        console.log('Body:', parsed.text);
+      })
+      .catch(err => {
+        console.error('Error parsing mail:', err);
+      });
+
     stream.on('end', callback);
   },
+
+  // Optional authentication (uncomment if needed)
+  // onAuth(auth, session, callback) {
+  //   if (auth.username === 'your-username' && auth.password === 'your-password') {
+  //     callback(null, { user: 'authorized' });
+  //   } else {
+  //     return callback(new Error('Invalid credentials'));
+  //   }
+  // }
 });
 
-// Start the server on port 10000
-server.listen(10000, () => {
-  console.log('SMTP server listening on port 10000');
+// Start listening on port 587 (or another if necessary)
+server.listen(587, () => {
+  console.log('SMTP server is listening on port 587');
 });
+
+
+
+setTimeout(() => {
+const nodemailer = require('nodemailer');
+
+// Create a transporter to connect to the SMTP server
+let transporter = nodemailer.createTransport({
+  host: 'localhost', // Replace with your server's IP if hosted remotely
+  port: 587, // Use the same port your SMTP server is listening on
+  secure: false, // Use TLS or SSL if your server requires it
+  tls: {
+    rejectUnauthorized: false // For testing, disable certificate validation
+  }
+});
+
+// Define the email options
+let mailOptions = {
+  from: '"Test Sender" <sender@example.com>', // Sender address
+  to: 'recipient@example.com', // List of receivers (use a dummy email for testing)
+  subject: 'Test Email', // Subject line
+  text: 'This is a test email sent using Node.js and nodemailer.', // Plain text body
+  html: '<b>This is a test email sent using Node.js and nodemailer.</b>' // HTML body
+};
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    return console.log('Error:', error);
+  }
+  console.log('Email sent:', info.response);
+});
+}, 5000);
