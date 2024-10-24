@@ -44,7 +44,7 @@ const nodemailer = require('nodemailer');
 
 // Create a transporter to connect to the SMTP server
 let transporter = nodemailer.createTransport({
-  host: 'localhost', // Replace with your server's IP if hosted remotely
+  host: 'simple-test-smtp.onrender.com', // Replace with your server's IP if hosted remotely
   port: 587, // Use the same port your SMTP server is listening on
   secure: false, // Use TLS or SSL if your server requires it
   tls: {
