@@ -1,6 +1,6 @@
 const { SMTPServer } = require('smtp-server');
 const simpleParser = require('mailparser').simpleParser; // To parse incoming mail
-
+const nodemailer = require('nodemailer');
 // Create the SMTP server
 const server = new SMTPServer({
   // Allow valid email addresses and authentication (if needed)
@@ -41,6 +41,31 @@ server.listen(8001, () => {
 
   app.get("/", (req, res) => {
 res.send(true);
+    let transporter = nodemailer.createTransport({
+  host: 'qopi.onrender.com', // Replace with your server's IP if hosted remotely
+  port: 8001, // Use the same port your SMTP server is listening on
+  secure: false, // Use TLS or SSL if your server requires it
+  tls: {
+    rejectUnauthorized: false // For testing, disable certificate validation
+  }
+});
+
+// Define the email options
+let mailOptions = {
+  from: '"Test Sender" <sender@example.com>', // Sender address
+  to: 'recipient@example.com', // List of receivers (use a dummy email for testing)
+  subject: 'Test Email', // Subject line
+  text: 'This is a test email sent using Node.js and nodemailer.', // Plain text body
+  html: '<b>This is a test email sent using Node.js and nodemailer.</b>' // HTML body
+};
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    return console.log('Error:', error);
+  }
+  console.log('Email sent:', info.response);
+});
   });
 });
 
