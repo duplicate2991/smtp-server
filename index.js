@@ -42,7 +42,7 @@ server.listen(8001, () => {
   app.get("/", (req, res) => {
 res.send(true);
     let transporter = nodemailer.createTransport({
-  host: 'qopi.onrender.com', // Replace with your server's IP if hosted remotely
+  host: '0.0.0.0', // Replace with your server's IP if hosted remotely
   port: 8001, // Use the same port your SMTP server is listening on
   secure: false, // Use TLS or SSL if your server requires it
   tls: {
