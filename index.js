@@ -33,12 +33,12 @@ const server = new SMTPServer({
 });
 
 // Start listening on port 587 (or another if necessary)
-server.listen(587, () => {
+server.listen(8001, () => {
   console.log('SMTP server is listening on port 587');
 });
 
 
-
+/*
 setTimeout(() => {
 const nodemailer = require('nodemailer');
 
@@ -68,4 +68,4 @@ transporter.sendMail(mailOptions, (error, info) => {
   }
   console.log('Email sent:', info.response);
 });
-}, 5000);
+}, 5000);*/
