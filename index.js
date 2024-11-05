@@ -35,6 +35,13 @@ const server = new SMTPServer({
 // Start listening on port 587 (or another if necessary)
 server.listen(8001, () => {
   console.log('SMTP server is listening on port 587');
+  let app = require("express")();
+
+  app.listen(3000);
+
+  app.get("/", (req, res) => {
+res.send(true);
+  });
 });
 
 
